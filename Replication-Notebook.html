@@ -14334,9 +14334,9 @@ Requirement already satisfied: pymongo in ./venv/lib/python3.8/site-packages (fr
 Requirement already satisfied: python-Levenshtein in ./venv/lib/python3.8/site-packages (from pycoshark==1.3.1) (0.12.0)
 Requirement already satisfied: python-dateutil in ./venv/lib/python3.8/site-packages (from pycoshark==1.3.1) (2.8.1)
 Requirement already satisfied: cycler&gt;=0.10 in ./venv/lib/python3.8/site-packages (from matplotlib==3.1.3) (0.10.0)
-Requirement already satisfied: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,&gt;=2.0.1 in ./venv/lib/python3.8/site-packages (from matplotlib==3.1.3) (2.4.7)
 Requirement already satisfied: kiwisolver&gt;=1.0.1 in ./venv/lib/python3.8/site-packages (from matplotlib==3.1.3) (1.2.0)
 Requirement already satisfied: numpy&gt;=1.11 in ./venv/lib/python3.8/site-packages (from matplotlib==3.1.3) (1.19.2)
+Requirement already satisfied: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,&gt;=2.0.1 in ./venv/lib/python3.8/site-packages (from matplotlib==3.1.3) (2.4.7)
 Requirement already satisfied: pytz&gt;=2017.2 in ./venv/lib/python3.8/site-packages (from pandas==0.25.3) (2020.1)
 Requirement already satisfied: scipy&gt;=0.14.0 in ./venv/lib/python3.8/site-packages (from seaborn==0.9.0) (1.5.2)
 Requirement already satisfied: statsmodels&gt;=0.10.0 in ./venv/lib/python3.8/site-packages (from autorank==1.0.1) (0.12.0)
@@ -14630,6 +14630,8 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># code adopted from from VisualSHARK leaderboard code</span>
 <span class="c1"># https://github.com/smartshark/visualSHARK/blob/line_labels/visualSHARK/management/commands/update_leaderboard.py</span>
 <span class="k">if</span> <span class="n">use_mongodb</span><span class="p">:</span>
+    <span class="n">uri</span> <span class="o">=</span> <span class="n">create_mongodb_uri_string</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">)</span>
+    <span class="n">connect</span><span class="p">(</span><span class="n">database_name</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
     <span class="n">project_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ant-ivy&#39;</span><span class="p">,</span> <span class="s1">&#39;archiva&#39;</span><span class="p">,</span> <span class="s1">&#39;calcite&#39;</span><span class="p">,</span> <span class="s1">&#39;cayenne&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-bcel&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-beanutils&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;commons-codec&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-collections&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-compress&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-configuration&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;commons-dbcp&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-digester&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-io&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-jcs&#39;</span><span class="p">,</span> <span class="s1">&#39;commons-jexl&#39;</span><span class="p">,</span>
@@ -14639,6 +14641,14 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
                 <span class="s1">&#39;santuario-java&#39;</span><span class="p">,</span> <span class="s1">&#39;systemml&#39;</span><span class="p">,</span> <span class="s1">&#39;tika&#39;</span><span class="p">,</span> <span class="s1">&#39;wss4j&#39;</span><span class="p">]</span>
 
     <span class="n">projects</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">total_bugs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_commits</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_bugs_included</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_commits_included</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">multi_commit_bugs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">multi_commit_commits</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">multi_bugfixes</span> <span class="o">=</span> <span class="mi">0</span>
+    
     <span class="k">for</span> <span class="n">project_name</span> <span class="ow">in</span> <span class="n">project_list</span><span class="p">:</span>
 
         <span class="k">if</span> <span class="n">project_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
@@ -14651,13 +14661,17 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
                                       <span class="s1">&#39;partial_commits_3&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
         <span class="n">project</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">project_name</span><span class="p">)</span>
         <span class="n">its</span> <span class="o">=</span> <span class="n">IssueSystem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-
+        <span class="n">vcs</span> <span class="o">=</span> <span class="n">VCSSystem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">latest_commit</span> <span class="o">=</span> <span class="n">Commit</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">vcs_system_id</span><span class="o">=</span><span class="n">vcs</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;committer_date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;committer_date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="n">projects</span><span class="p">[</span><span class="n">project_name</span><span class="p">][</span><span class="s1">&#39;start_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">latest_commit</span><span class="o">.</span><span class="n">committer_date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>                                                              
+        <span class="n">projects</span><span class="p">[</span><span class="n">project_name</span><span class="p">][</span><span class="s1">&#39;end_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">its</span><span class="o">.</span><span class="n">last_updated</span><span class="p">,</span> <span class="n">vcs</span><span class="o">.</span><span class="n">last_updated</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        
         <span class="c1"># 1. verified bug issues</span>
         <span class="k">for</span> <span class="n">issue</span> <span class="ow">in</span> <span class="n">Issue</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">issue_system_id</span><span class="o">=</span><span class="n">its</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">issue_type_verified</span><span class="o">=</span><span class="s1">&#39;bug&#39;</span><span class="p">):</span>
-
             <span class="c1"># 2. only issues that are fixed such that not multiple bugs are fixed as part fo the commit</span>
             <span class="n">has_fix</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">is_multifix</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">num_commits</span> <span class="o">=</span> <span class="n">Commit</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">fixed_issue_ids</span><span class="o">=</span><span class="n">issue</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">commit</span> <span class="ow">in</span> <span class="n">Commit</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">fixed_issue_ids</span><span class="o">=</span><span class="n">issue</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;fixed_issue_ids&#39;</span><span class="p">):</span>
                 <span class="n">has_fix</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">for</span> <span class="n">fix_id</span> <span class="ow">in</span> <span class="n">commit</span><span class="o">.</span><span class="n">fixed_issue_ids</span><span class="p">:</span>
@@ -14665,11 +14679,21 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
                         <span class="n">fixed_issue</span> <span class="o">=</span> <span class="n">Issue</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">fix_id</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
                         <span class="k">if</span> <span class="n">fixed_issue</span><span class="o">.</span><span class="n">issue_type_verified</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fixed_issue</span><span class="o">.</span><span class="n">issue_type_verified</span><span class="o">==</span><span class="s1">&#39;bug&#39;</span><span class="p">:</span>
                             <span class="n">is_multifix</span> <span class="o">=</span> <span class="kc">True</span>
-
+            <span class="k">if</span> <span class="n">has_fix</span><span class="p">:</span>
+                <span class="n">total_bugs</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">total_commits</span> <span class="o">+=</span> <span class="n">num_commits</span>
+                <span class="k">if</span> <span class="n">is_multifix</span><span class="p">:</span>
+                    <span class="n">multi_bugfixes</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">num_commits</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">multi_commit_bugs</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">multi_commit_commits</span> <span class="o">+=</span> <span class="n">num_commits</span>
+                <span class="k">if</span> <span class="n">is_multifix</span><span class="p">:</span>
+                    <span class="n">multi_bugfixes</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">has_fix</span> <span class="ow">or</span> <span class="n">is_multifix</span><span class="p">:</span>
                 <span class="k">continue</span>
+            <span class="n">total_bugs_included</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">total_commits_included</span> <span class="o">+=</span> <span class="n">num_commits</span>
 
-            <span class="n">num_commits</span> <span class="o">=</span> <span class="n">Commit</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">fixed_issue_ids</span><span class="o">=</span><span class="n">issue</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
             <span class="n">labels</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">for</span> <span class="n">commit</span> <span class="ow">in</span> <span class="n">Commit</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">fixed_issue_ids</span><span class="o">=</span><span class="n">issue</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">):</span>
                 <span class="c1"># the breaks are ugly optimizations</span>
@@ -14685,7 +14709,7 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
                             <span class="k">if</span> <span class="n">labels</span><span class="o">!=-</span><span class="mi">1</span><span class="p">:</span>
                                 <span class="k">break</span>
                             <span class="n">labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">lines_manual</span><span class="p">)</span>
-
+                            
             <span class="n">projects</span><span class="p">[</span><span class="n">project_name</span><span class="p">][</span><span class="s1">&#39;need_issues&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">projects</span><span class="p">[</span><span class="n">project_name</span><span class="p">][</span><span class="s1">&#39;need_commits&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">num_commits</span>
             <span class="k">if</span> <span class="n">labels</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
@@ -14698,6 +14722,14 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
                 <span class="n">projects</span><span class="p">[</span><span class="n">project_name</span><span class="p">][</span><span class="s1">&#39;finished_issues&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">projects</span><span class="p">[</span><span class="n">project_name</span><span class="p">][</span><span class="s1">&#39;finished_commits&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">num_commits</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total bugs in data:&#39;</span><span class="p">,</span> <span class="n">total_bugs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total commits in data :&#39;</span><span class="p">,</span> <span class="n">total_commits</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Bugs fixed in the same commit as other bugs (excluded):&#39;</span><span class="p">,</span> <span class="n">multi_bugfixes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total bugs included in study:&#39;</span><span class="p">,</span> <span class="n">total_bugs_included</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total commits included in study:&#39;</span><span class="p">,</span> <span class="n">total_commits_included</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of bugs fixed in multiple commits:&#39;</span><span class="p">,</span> <span class="n">multi_commit_bugs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of commits affected:&#39;</span><span class="p">,</span> <span class="n">multi_commit_commits</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Partially labeled commits:&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 Label:&#39;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;partial_commits_1&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">projects</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;2 Label:&#39;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;partial_commits_2&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">projects</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span>
@@ -14714,9 +14746,15 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
             <span class="n">total_bugs_finished</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;finished_issues&#39;</span><span class="p">]</span>
             <span class="n">total_commits_needed</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;need_commits&#39;</span><span class="p">]</span>
             <span class="n">total_commits_finished</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;finished_commits&#39;</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> </span><span class="se">\\\\</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;need_issues&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;need_commits&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;finished_issues&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;finished_commits&#39;</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> &amp; </span><span class="si">%s</span><span class="s1"> -- </span><span class="si">%s</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> / </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> / </span><span class="si">%d</span><span class="s1"> </span><span class="se">\\\\</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">project</span><span class="p">,</span>
+                                                              <span class="n">data</span><span class="p">[</span><span class="s1">&#39;start_date&#39;</span><span class="p">],</span>
+                                                              <span class="n">data</span><span class="p">[</span><span class="s1">&#39;end_date&#39;</span><span class="p">],</span>
+                                                              <span class="n">data</span><span class="p">[</span><span class="s1">&#39;finished_issues&#39;</span><span class="p">],</span>
+                                                              <span class="n">data</span><span class="p">[</span><span class="s1">&#39;need_issues&#39;</span><span class="p">],</span>
+                                                              <span class="n">data</span><span class="p">[</span><span class="s1">&#39;finished_commits&#39;</span><span class="p">],</span>
+                                                              <span class="n">data</span><span class="p">[</span><span class="s1">&#39;need_commits&#39;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">hline&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total &amp; </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> </span><span class="se">\\\\</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total_bugs_needed</span><span class="p">,</span> <span class="n">total_commits_needed</span><span class="p">,</span> <span class="n">total_bugs_finished</span><span class="p">,</span> <span class="n">total_commits_finished</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total &amp;&amp; </span><span class="si">%d</span><span class="s1"> / </span><span class="si">%d</span><span class="s1"> &amp; </span><span class="si">%d</span><span class="s1"> / </span><span class="si">%d</span><span class="s1"> </span><span class="se">\\\\</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total_bugs_finished</span><span class="p">,</span> <span class="n">total_bugs_needed</span><span class="p">,</span> <span class="n">total_commits_finished</span><span class="p">,</span> <span class="n">total_commits_needed</span><span class="p">))</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;skipping (use_mongodb==False)&#39;</span><span class="p">)</span>
 </pre></div>
@@ -14738,41 +14776,49 @@ Requirement already satisfied: patsy&gt;=0.5 in ./venv/lib/python3.8/site-packag
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Partially labeled commits:
+<pre>Total bugs in data: 6533
+Total commits in data : 10878
+Bugs fixed in the same commit as other bugs (excluded): 508
+Total bugs included in study: 6279
+Total commits included in study: 10389
+Number of bugs fixed in multiple commits: 2283
+Number of commits affected: 6393
+
+Partially labeled commits:
 1 Label: 1387
 2 Label: 678
 3 Label: 260
 
-ant-ivy &amp; 404 &amp; 547 &amp; 402 &amp; 542 \\
-archiva &amp; 278 &amp; 509 &amp; 4 &amp; 5 \\
-commons-bcel &amp; 33 &amp; 52 &amp; 33 &amp; 52 \\
-commons-beanutils &amp; 47 &amp; 60 &amp; 47 &amp; 60 \\
-commons-codec &amp; 27 &amp; 58 &amp; 27 &amp; 58 \\
-commons-collections &amp; 48 &amp; 93 &amp; 48 &amp; 93 \\
-commons-compress &amp; 119 &amp; 205 &amp; 119 &amp; 205 \\
-commons-configuration &amp; 140 &amp; 253 &amp; 140 &amp; 253 \\
-commons-dbcp &amp; 57 &amp; 89 &amp; 57 &amp; 89 \\
-commons-digester &amp; 17 &amp; 26 &amp; 17 &amp; 26 \\
-commons-io &amp; 72 &amp; 125 &amp; 71 &amp; 115 \\
-commons-jcs &amp; 58 &amp; 73 &amp; 58 &amp; 73 \\
-commons-lang &amp; 147 &amp; 225 &amp; 147 &amp; 225 \\
-commons-math &amp; 234 &amp; 391 &amp; 234 &amp; 391 \\
-commons-net &amp; 127 &amp; 176 &amp; 127 &amp; 176 \\
-commons-scxml &amp; 46 &amp; 67 &amp; 46 &amp; 67 \\
-commons-validator &amp; 57 &amp; 75 &amp; 57 &amp; 75 \\
-commons-vfs &amp; 94 &amp; 118 &amp; 94 &amp; 118 \\
-deltaspike &amp; 146 &amp; 219 &amp; 10 &amp; 13 \\
-eagle &amp; 111 &amp; 121 &amp; 18 &amp; 19 \\
-giraph &amp; 140 &amp; 146 &amp; 140 &amp; 146 \\
-gora &amp; 56 &amp; 98 &amp; 56 &amp; 98 \\
-jspwiki &amp; 144 &amp; 205 &amp; 6 &amp; 8 \\
-opennlp &amp; 106 &amp; 151 &amp; 106 &amp; 151 \\
-parquet-mr &amp; 83 &amp; 119 &amp; 83 &amp; 119 \\
-santuario-java &amp; 49 &amp; 95 &amp; 49 &amp; 95 \\
-systemml &amp; 279 &amp; 314 &amp; 25 &amp; 29 \\
-wss4j &amp; 150 &amp; 245 &amp; 150 &amp; 245 \\
+ant-ivy &amp; 2005-06-16 -- 2018-02-13 &amp; 402 / 404 &amp; 542 / 547 \\
+archiva &amp; 2005-11-23 -- 2018-07-25 &amp; 4 / 278 &amp; 5 / 509 \\
+commons-bcel &amp; 2001-10-29 -- 2019-03-12 &amp; 33 / 33 &amp; 52 / 52 \\
+commons-beanutils &amp; 2001-03-27 -- 2018-11-15 &amp; 47 / 47 &amp; 60 / 60 \\
+commons-codec &amp; 2003-04-25 -- 2018-11-15 &amp; 27 / 27 &amp; 58 / 58 \\
+commons-collections &amp; 2001-04-14 -- 2018-11-15 &amp; 48 / 48 &amp; 93 / 93 \\
+commons-compress &amp; 2003-11-23 -- 2018-11-15 &amp; 119 / 119 &amp; 205 / 205 \\
+commons-configuration &amp; 2003-12-23 -- 2018-11-15 &amp; 140 / 140 &amp; 253 / 253 \\
+commons-dbcp &amp; 2001-04-14 -- 2019-03-12 &amp; 57 / 57 &amp; 89 / 89 \\
+commons-digester &amp; 2001-05-03 -- 2018-11-16 &amp; 17 / 17 &amp; 26 / 26 \\
+commons-io &amp; 2002-01-25 -- 2018-11-16 &amp; 71 / 72 &amp; 115 / 125 \\
+commons-jcs &amp; 2002-04-07 -- 2018-11-16 &amp; 58 / 58 &amp; 73 / 73 \\
+commons-lang &amp; 2002-07-19 -- 2018-10-10 &amp; 147 / 147 &amp; 225 / 225 \\
+commons-math &amp; 2003-05-12 -- 2018-02-15 &amp; 234 / 234 &amp; 391 / 391 \\
+commons-net &amp; 2002-04-03 -- 2018-11-14 &amp; 127 / 127 &amp; 176 / 176 \\
+commons-scxml &amp; 2005-08-17 -- 2018-11-16 &amp; 46 / 46 &amp; 67 / 67 \\
+commons-validator &amp; 2002-01-06 -- 2018-11-19 &amp; 57 / 57 &amp; 75 / 75 \\
+commons-vfs &amp; 2002-07-16 -- 2018-11-19 &amp; 94 / 94 &amp; 118 / 118 \\
+deltaspike &amp; 2011-12-22 -- 2018-08-02 &amp; 10 / 146 &amp; 13 / 219 \\
+eagle &amp; 2015-10-16 -- 2019-01-29 &amp; 18 / 111 &amp; 19 / 121 \\
+giraph &amp; 2010-10-29 -- 2018-11-21 &amp; 140 / 140 &amp; 146 / 146 \\
+gora &amp; 2010-10-08 -- 2019-04-10 &amp; 56 / 56 &amp; 98 / 98 \\
+jspwiki &amp; 2001-07-06 -- 2019-01-11 &amp; 6 / 144 &amp; 8 / 205 \\
+opennlp &amp; 2008-09-28 -- 2018-06-18 &amp; 106 / 106 &amp; 151 / 151 \\
+parquet-mr &amp; 2012-08-31 -- 2018-07-12 &amp; 83 / 83 &amp; 119 / 119 \\
+santuario-java &amp; 2001-09-28 -- 2019-04-11 &amp; 49 / 49 &amp; 95 / 95 \\
+systemml &amp; 2012-01-11 -- 2018-08-20 &amp; 25 / 279 &amp; 29 / 314 \\
+wss4j &amp; 2004-02-13 -- 2018-07-13 &amp; 150 / 150 &amp; 245 / 245 \\
 \hline
-Total &amp; 3269 &amp; 4855 &amp; 2371 &amp; 3546 \\
+Total &amp;&amp; 2371 / 3269 &amp; 3546 / 4855 \\
 </pre>
 </div>
 </div>
