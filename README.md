@@ -10,7 +10,7 @@ This repository contains the replication kit for our manuscript [Large-Scale Man
 
 ## SmartSHARK MongoDB
 
-The hunk_labels.json only contains the data on hunk level, other information, such as commit messages, issues or similar are not included. The complete data we have for all projects, including the manual labels and the calculated consensus labels is available in [release 1.1 of the SmartSHARK MongoDB](https://smartshark.github.io/dbreleases/). This database is not directly included in this replication kit due to the size, but the database is also available in a [long-term archive on Zenodo](https://doi.org/10.5281/zenodo.4095238). 
+The hunk_labels.json only contains the data on hunk level, other information, such as commit messages, issues or similar are not included. The complete data we have for all projects, including the manual labels and the calculated consensus labels is available in [release 1.2 of the SmartSHARK MongoDB](https://smartshark.github.io/dbreleases/). This database is not directly included in this replication kit due to the size, but the database is also available in a [long-term archive on Zenodo](https://doi.org/10.5281/zenodo.4095238). 
 
 ## (Optional) Preparing the MongoDB
 
@@ -23,14 +23,14 @@ You need to complete the following steps to prepare you local MongoDB. Please no
 For example, on Ubuntu 18.04 you can achieve all this as follows for the release 1.1 of our database that we used for this replication kit. 
 
 ```
-wget -O smartshark_1_1.agz https://zenodo.org/record/4095238/files/smartshark_1_1.agz?download=1
+wget -O smartshark_1_2.agz https://zenodo.org/record/4095238/files/smartshark_1_2.agz?download=1
 wget -qO - https://www.mongodb.org/static/pgp/server-4.0.asc | sudo apt-key add -
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 sudo systemctl daemon-reload
 sudo systemctl start mongod
-mongorestore --gzip --archive=smartshark_1_1.agz
+mongorestore --gzip --archive=smartshark_1_2.agz
 ```
 
 ## Running the Notebook
